@@ -1,4 +1,4 @@
 <% @to_dos.each do |to_do| %>
   <%= link_to to_do.title, to_do_path(to_do), method: :delete, data: { confirm: '削除してもよろしいですか?' } %>
-  <p><%= to_do.title %></p>
+  <%= to_do.expired_at&.to_s %>
 <% end %>
