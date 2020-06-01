@@ -1,16 +1,24 @@
 <template>
-  <el-table :data="toDos" style="width: 100%">
-    <el-table-column prop="title" label="Date" width="180"></el-table-column>
-    <el-table-column prop="expired_at" label="Name" width="180"></el-table-column>
-    <el-table-column width="120">
-      <template v-slot="scope">
-        <el-button @click="destroyToDo(scope.row.id)" type="danger" icon="el-icon-delete" circle></el-button>
-      </template>
-    </el-table-column>
-  </el-table>
+  <div id="app">
+    <el-table :data="toDos" style="width: 100%">
+      <el-table-column prop="finished">
+        <template v-slot="scope">
+          <el-checkbox v-model="scope.row.finished" @change="updateToDo(scope.row.id, scope.row.finished)"></el-checkbox>
+        </template>
+      </el-table-column>
+      <el-table-column prop="title" label="Date" width="180"></el-table-column>
+      <el-table-column prop="expired_at" label="Name" width="180"></el-table-column>
+      <el-table-column width="120">
+        <template v-slot="scope">
+          <el-button @click="destroyToDo(scope.row.id)" type="danger" icon="el-icon-delete" circle></el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 <script>
 import axios from 'axios'
+import {reject} from 'lodash';
 export default {
   data() {
     return {
@@ -25,7 +33,17 @@ export default {
   methods: {
     destroyToDo(id) {
       axios.delete('/api/v1/to_dos/' + id).then(res => {
+        if(res.status === 200) {
+          this.toDos = reject(this.toDos, ['id', id]);
+        }
       });
+    },
+    updateToDo(id, finished) {
+      axios.patch('/api/v1/to_dos/' + id, {to_do: {finished: finished}}).then(res => {
+        if (res.status === 200) {
+          console.log(res)
+        }
+      })
     }
   }
 }
